@@ -2,8 +2,8 @@ package com.dalimao.mytaxi.splash;
 
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.dalimao.mytaxi.R;
@@ -20,5 +20,7 @@ public class SplashActivity extends AppCompatActivity {
             logo.setImageDrawable(anim1);
             anim1.start();
         }
+
+
     }
 }

@@ -10,6 +10,8 @@ import org.junit.Test;
  * Created by liuguangli on 17/4/29.
  */
 public class OkHttpClientImplTest {
+
+
     IHttpClient httpClient;
     @Before
     public void setUp() throws Exception {
