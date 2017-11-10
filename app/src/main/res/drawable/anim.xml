@@ -4,7 +4,4 @@
     <target
         android:name="logo"
         android:animation="@animator/anim_bar_fill" />
-
-
-
 </animated-vector>

@@ -1,7 +1,5 @@
 package com.dalimao.mytaxi.common.http.impl;
 
-import android.util.Log;
-
 import com.dalimao.mytaxi.common.http.IHttpClient;
 import com.dalimao.mytaxi.common.http.IRequest;
 import com.dalimao.mytaxi.common.http.IResponse;
@@ -28,6 +26,7 @@ public class OkHttpClientImpl implements IHttpClient {
         /**
          *  解析业务参数
          */
+
         // 指定请求方式
         request.setMethod(IRequest.GET);
         // 解析头部
