@@ -4,64 +4,64 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.dalimao.mytaxi.account.model.IAccountManager;
+import com.dalimao.mytaxi.account.model.response.SmsCodeResponse;
+import com.dalimao.mytaxi.account.model.response.UserExistResponse;
 import com.dalimao.mytaxi.account.view.ISmsCodeDialogView;
+import com.dalimao.mytaxi.common.databus.RegisterBus;
 
 import java.lang.ref.WeakReference;
 
 /**
- * Created by TYZ on 2017/11/9.
+ * Created by liuguangli on 17/5/13.
  */
 
 public class SmsCodeDialogPresenterImpl implements ISmsCodeDialogPresenter {
-
     private ISmsCodeDialogView view;
     private IAccountManager accountManager;
-    /**
-     * 接受消息并处理
-     */
-    private static class MyHandler extends Handler {
-        WeakReference<SmsCodeDialogPresenterImpl> refContext;
-        public MyHandler(SmsCodeDialogPresenterImpl context) {
-            refContext = new WeakReference(context);
-        }
 
-        @Override
-        public void handleMessage(Message msg) {
+    @RegisterBus
+    public void onSmsCodeResponse(SmsCodeResponse smsCodeResponse) {
+        switch (smsCodeResponse.getCode()) {
+            case IAccountManager.SMS_SEND_SUC:
+                view.showCountDownTimer();
+                break;
+            case IAccountManager.SMS_SEND_FAIL:
+                view.showError(IAccountManager.SMS_SEND_FAIL, "");
+                break;
+            case IAccountManager.SMS_CHECK_SUC:
+                view.showSmsCodeCheckState(true);
 
-            SmsCodeDialogPresenterImpl presenter = refContext.get();
-            switch (msg.what) {
-                case IAccountManager.SMS_SEND_SUC:
-                    presenter.view.showCountDownTimer();
-                    break;
-                case IAccountManager.SMS_SEND_FAIL:
-                    presenter.view.showError(IAccountManager.SMS_SEND_FAIL, "");
-                    break;
-                case IAccountManager.SMS_CHECK_SUC:
-                    presenter.view.showSmsCodeCheckState(true);
-
-                    break;
-                case IAccountManager.SMS_CHECK_FAIL:
-                    presenter.view.showError(IAccountManager.SMS_CHECK_FAIL, "");
-                    break;
-                case IAccountManager.USER_EXIST:
-                    presenter.view.showUserExist(true);
-                    break;
-                case IAccountManager.USER_NOT_EXIST:
-                    presenter.view.showUserExist(false);
-                    break;
-                case IAccountManager.SERVER_FAIL:
-                    presenter.view.showError(IAccountManager.SERVER_FAIL, "");
-                    break;
-
-            }
+                break;
+            case IAccountManager.SMS_CHECK_FAIL:
+                view.showError(IAccountManager.SMS_CHECK_FAIL, "");
+                break;
+            case IAccountManager.SERVER_FAIL:
+                view.showError(IAccountManager.SERVER_FAIL, "");
+                break;
         }
     }
 
+    @RegisterBus
+    public void onSmsCodeResponse(UserExistResponse userExistResponse) {
+        switch (userExistResponse.getCode()) {
+
+            case IAccountManager.USER_EXIST:
+                view.showUserExist(true);
+                break;
+            case IAccountManager.USER_NOT_EXIST:
+               view.showUserExist(false);
+                break;
+            case IAccountManager.SERVER_FAIL:
+                view.showError(IAccountManager.SERVER_FAIL, "");
+                break;
+
+        }
+    }
     public SmsCodeDialogPresenterImpl(ISmsCodeDialogView view,
                                       IAccountManager accountManager) {
         this.view = view;
         this.accountManager = accountManager;
-        accountManager.setHandler(new MyHandler(this));
+
     }
 
     /**

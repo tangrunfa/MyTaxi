@@ -3,6 +3,9 @@ package com.dalimao.mytaxi.account.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -13,12 +16,26 @@ import com.dalimao.mytaxi.MyTaxiApplication;
 import com.dalimao.mytaxi.R;
 import com.dalimao.mytaxi.account.model.AccountManagerImpl;
 import com.dalimao.mytaxi.account.model.IAccountManager;
+import com.dalimao.mytaxi.account.model.response.Account;
+import com.dalimao.mytaxi.account.model.response.LoginResponse;
+import com.dalimao.mytaxi.account.presenter.ICreatePasswordDialogPresenter;
 import com.dalimao.mytaxi.account.presenter.ILoginDialogPresenter;
 import com.dalimao.mytaxi.account.presenter.LoginDialogPresenterImpl;
+import com.dalimao.mytaxi.common.databus.RxBus;
 import com.dalimao.mytaxi.common.http.IHttpClient;
+import com.dalimao.mytaxi.common.http.IRequest;
+import com.dalimao.mytaxi.common.http.IResponse;
+import com.dalimao.mytaxi.common.http.api.API;
+import com.dalimao.mytaxi.common.http.biz.BaseBizResponse;
+import com.dalimao.mytaxi.common.http.impl.BaseRequest;
+import com.dalimao.mytaxi.common.http.impl.BaseResponse;
 import com.dalimao.mytaxi.common.http.impl.OkHttpClientImpl;
 import com.dalimao.mytaxi.common.storage.SharedPreferencesDao;
 import com.dalimao.mytaxi.common.util.ToastUtil;
+import com.dalimao.mytaxi.main.view.MainActivity;
+import com.google.gson.Gson;
+
+import java.lang.ref.SoftReference;
 
 
 /**
@@ -26,11 +43,11 @@ import com.dalimao.mytaxi.common.util.ToastUtil;
  * Created by liuguangli on 17/2/26.
  */
 
-public class LoginDialog extends Dialog implements ILoginView{
+public class LoginDialog extends Dialog implements ILoginView {
 
 
     private static final String TAG = "LoginDialog";
-
+    private  MainActivity mainActivity;
     private TextView mPhone;
     private EditText mPw;
     private Button mBtnConfirm;
@@ -39,15 +56,18 @@ public class LoginDialog extends Dialog implements ILoginView{
     private String mPhoneStr;
     private ILoginDialogPresenter mPresenter;
 
-    public LoginDialog(Context context, String phone) {
+
+
+    public LoginDialog(MainActivity context, String phone) {
         this(context, R.style.Dialog);
         mPhoneStr = phone;
         IHttpClient httpClient = new OkHttpClientImpl();
         SharedPreferencesDao dao =
                 new SharedPreferencesDao(MyTaxiApplication.getInstance(),
                         SharedPreferencesDao.FILE_ACCOUNT);
-        IAccountManager iAccountManager = new AccountManagerImpl(httpClient, dao);
-        mPresenter = new LoginDialogPresenterImpl(this, iAccountManager);
+        IAccountManager accountManager = new AccountManagerImpl(httpClient, dao);
+        mPresenter = new LoginDialogPresenterImpl(this, accountManager);
+        this.mainActivity = context;
     }
 
     public LoginDialog(Context context, int theme) {
@@ -69,12 +89,16 @@ public class LoginDialog extends Dialog implements ILoginView{
         setContentView(root);
         initViews();
 
+        // 注册 Presenter
+        RxBus.getInstance().register(mPresenter);
     }
+
 
     @Override
     public void dismiss() {
         super.dismiss();
-
+        // 注销 Presenter
+        RxBus.getInstance().unRegister(mPresenter);
     }
 
     private void initViews() {
@@ -115,7 +139,7 @@ public class LoginDialog extends Dialog implements ILoginView{
      * @param show
      */
 
-    public void showOrHideLoading(boolean show) {
+    private void showOrHideLoading(boolean show) {
         if (show) {
             mLoading.setVisibility(View.VISIBLE);
             mBtnConfirm.setVisibility(View.GONE);
@@ -128,37 +152,16 @@ public class LoginDialog extends Dialog implements ILoginView{
     /**
      * 处理登录成功 UI
      */
+    @Override
     public void showLoginSuc() {
-        mLoading.setVisibility(View.GONE);
-        mBtnConfirm.setVisibility(View.GONE);
+        showOrHideLoading(false);
         mTips.setVisibility(View.VISIBLE);
         mTips.setTextColor(getContext().getResources().getColor(R.color.color_text_normal));
         mTips.setText(getContext().getString(R.string.login_suc));
         ToastUtil.show(getContext(), getContext().getString(R.string.login_suc));
         dismiss();
+        mainActivity.showLoginSuc();
 
-    }
-
-    /**
-     *  显示服服务器出错
-     */
-
-    public void showServerError() {
-        showOrHideLoading(false);
-        mTips.setVisibility(View.VISIBLE);
-        mTips.setTextColor(getContext().getResources().getColor(R.color.error_red));
-        mTips.setText(getContext().getString(R.string.error_server));
-    }
-
-
-    /**
-     * 密码错误
-      */
-    public void showPasswordError() {
-        showOrHideLoading(false);
-        mTips.setVisibility(View.VISIBLE);
-        mTips.setTextColor(getContext().getResources().getColor(R.color.error_red));
-        mTips.setText(getContext().getString(R.string.password_error));
     }
 
     @Override
@@ -167,9 +170,9 @@ public class LoginDialog extends Dialog implements ILoginView{
     }
 
     @Override
-    public void showError(int Code, String msg) {
+    public void showError(int code, String msg) {
 
-        switch (Code) {
+        switch (code) {
             case IAccountManager.PW_ERROR:
                 // 密码错误
                 showPasswordError();
@@ -179,5 +182,26 @@ public class LoginDialog extends Dialog implements ILoginView{
                 showServerError();
                 break;
         }
+    }
+    /**
+     *  显示服服务器出错
+     */
+
+    private void showServerError() {
+        showOrHideLoading(false);
+        mTips.setVisibility(View.VISIBLE);
+        mTips.setTextColor(getContext().getResources().getColor(R.color.error_red));
+        mTips.setText(getContext().getString(R.string.error_server));
+    }
+
+
+    /**
+     * 密码错误
+     */
+    private void showPasswordError() {
+        showOrHideLoading(false);
+        mTips.setVisibility(View.VISIBLE);
+        mTips.setTextColor(getContext().getResources().getColor(R.color.error_red));
+        mTips.setText(getContext().getString(R.string.password_error));
     }
 }

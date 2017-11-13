@@ -1,7 +1,7 @@
 package com.dalimao.mytaxi.account.presenter;
 
 /**
- * Created by TYZ on 2017/11/9.
+ * Created by liuguangli on 17/5/13.
  */
 
 public interface ILoginDialogPresenter {
@@ -9,5 +9,4 @@ public interface ILoginDialogPresenter {
      * 登录
      */
     void requestLogin(String phone, String password);
-
 }

@@ -1,10 +1,13 @@
 package com.dalimao.mytaxi.account.view;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -17,10 +20,26 @@ import com.dalimao.mytaxi.account.model.AccountManagerImpl;
 import com.dalimao.mytaxi.account.model.IAccountManager;
 import com.dalimao.mytaxi.account.presenter.ISmsCodeDialogPresenter;
 import com.dalimao.mytaxi.account.presenter.SmsCodeDialogPresenterImpl;
+import com.dalimao.mytaxi.common.databus.RxBus;
 import com.dalimao.mytaxi.common.http.IHttpClient;
+import com.dalimao.mytaxi.common.http.IRequest;
+import com.dalimao.mytaxi.common.http.IResponse;
+import com.dalimao.mytaxi.common.http.api.API;
+import com.dalimao.mytaxi.common.http.biz.BaseBizResponse;
+import com.dalimao.mytaxi.common.http.impl.BaseRequest;
+import com.dalimao.mytaxi.common.http.impl.BaseResponse;
 import com.dalimao.mytaxi.common.http.impl.OkHttpClientImpl;
 import com.dalimao.mytaxi.common.storage.SharedPreferencesDao;
 import com.dalimao.mytaxi.common.util.ToastUtil;
+import com.dalimao.mytaxi.main.view.MainActivity;
+import com.google.gson.Gson;
+
+import java.lang.ref.SoftReference;
+
+
+/**
+ * Created by liuguangli on 17/3/5.
+ */
 
 public class SmsCodeDialog extends Dialog  implements  ISmsCodeDialogView{
     private static final String TAG = "SmsCodeDialog";
@@ -32,12 +51,12 @@ public class SmsCodeDialog extends Dialog  implements  ISmsCodeDialogView{
     private View mErrorView;
     private TextView mPhoneTv;
     private ISmsCodeDialogPresenter mPresenter;
+    private MainActivity mainActivity;
 
     /**
      *  验证码倒计时
      */
     private CountDownTimer mCountDownTimer = new CountDownTimer(10000,1000) {
-        @SuppressLint("StringFormatMatches")
         @Override
         public void onTick(long millisUntilFinished) {
 
@@ -58,16 +77,17 @@ public class SmsCodeDialog extends Dialog  implements  ISmsCodeDialogView{
 
 
 
-    public SmsCodeDialog(Context context, String phone) {
+    public SmsCodeDialog(MainActivity context, String phone) {
         this(context, R.style.Dialog);
         // 上一个界面传来的手机号
         this.mPhone = phone;
         IHttpClient httpClient = new OkHttpClientImpl();
         SharedPreferencesDao dao =
                 new SharedPreferencesDao(MyTaxiApplication.getInstance(),
-                        SharedPreferencesDao.FILE_ACCOUNT);
+                SharedPreferencesDao.FILE_ACCOUNT);
         IAccountManager iAccountManager = new AccountManagerImpl(httpClient, dao);
         mPresenter = new SmsCodeDialogPresenterImpl(this, iAccountManager);
+        this.mainActivity = context;
 
     }
 
@@ -91,8 +111,16 @@ public class SmsCodeDialog extends Dialog  implements  ISmsCodeDialogView{
         mErrorView.setVisibility(View.GONE);
         initListeners();
         requestSendSmsCode();
-    }
 
+        // 注册 Presenter
+        RxBus.getInstance().register(mPresenter);
+    }
+    @Override
+    public void dismiss() {
+        super.dismiss();
+        // 注销 Presenter
+        RxBus.getInstance().unRegister(mPresenter);
+    }
     /**
      * 请求下发验证码
      */
@@ -107,10 +135,7 @@ public class SmsCodeDialog extends Dialog  implements  ISmsCodeDialogView{
         mCountDownTimer.cancel();
 
     }
-    @Override
-    public void dismiss() {
-        super.dismiss();
-    }
+
 
 
     public SmsCodeDialog(Context context, int themeResId) {
@@ -178,8 +203,8 @@ public class SmsCodeDialog extends Dialog  implements  ISmsCodeDialogView{
         mLoading.setVisibility(View.GONE);
         switch (code) {
             case IAccountManager.SMS_SEND_FAIL:
-                ToastUtil.show(getContext(),
-                        getContext().getString(R.string.sms_send_fail));
+               ToastUtil.show(getContext(),
+                       getContext().getString(R.string.sms_send_fail));
                 break;
             case IAccountManager.SMS_CHECK_FAIL:
                 // 提示验证码错误
@@ -225,18 +250,29 @@ public class SmsCodeDialog extends Dialog  implements  ISmsCodeDialogView{
     public void showUserExist(boolean exist) {
         mLoading.setVisibility(View.GONE);
         mErrorView.setVisibility(View.GONE);
-        dismiss();
+
         if (!exist) {
             // 用户不存在,进入注册
             CreatePasswordDialog dialog =
-                    new CreatePasswordDialog(getContext(), mPhone);
+                    new CreatePasswordDialog(mainActivity, mPhone);
             dialog.show();
+            dialog.setOnDismissListener(new OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    dismiss();
+                }
+            });
 
         } else {
             // 用户存在 ，进入登录
-            LoginDialog dialog = new LoginDialog(getContext(), mPhone);
+            LoginDialog dialog = new LoginDialog(mainActivity, mPhone);
             dialog.show();
-
+            dialog.setOnDismissListener(new OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    dismiss();
+                }
+            });
         }
     }
 }

@@ -1,10 +1,15 @@
 package com.dalimao.mytaxi.account.view;
 
+import android.view.View;
+
+import com.dalimao.mytaxi.R;
+
 /**
- * Created by TYZ on 2017/11/9.
+ * Created by liuguangli on 17/5/13.
  */
 
-public interface ICreatePasswordDialogView   extends  IView{
+public interface ICreatePasswordDialogView extends IView {
+
     /**
      * 显示注册成功
      */

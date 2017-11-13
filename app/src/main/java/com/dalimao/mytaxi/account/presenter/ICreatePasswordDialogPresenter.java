@@ -1,7 +1,7 @@
 package com.dalimao.mytaxi.account.presenter;
 
 /**
- * Created by TYZ on 2017/11/9.
+ * Created by liuguangli on 17/5/13.
  */
 
 public interface ICreatePasswordDialogPresenter {
@@ -12,9 +12,10 @@ public interface ICreatePasswordDialogPresenter {
     /**
      *  提交注册
      */
-    void requestRegister(String phone,String code);
+    void requestRegister(String phone, String pw);
+
     /**
      * 登录
      */
-    void requestLogin(String phone,String pw);
+    void requestLogin(String phone, String pw);
 }

@@ -1,14 +1,14 @@
 package com.dalimao.mytaxi.account.presenter;
 
 /**
- * Created by TYZ on 2017/11/9.
+ * Created by liuguangli on 17/5/13.
  */
 
 public interface ISmsCodeDialogPresenter {
     /**
      *  请求下发验证码
      */
-        void  requestSendSmsCode(String phone);
+    void requestSendSmsCode(String phone);
     /**
      * 请求校验验证码
      */

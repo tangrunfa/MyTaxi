@@ -1,14 +1,19 @@
 package com.dalimao.mytaxi.account.view;
 
+
 /**
- * Created by TYZ on 2017/11/9.
+ * Created by liuguangli on 17/5/13.
  */
 
-public interface ISmsCodeDialogView  extends  IView {
+public interface ISmsCodeDialogView extends IView {
+
+
     /**
      * 显示倒计时
      */
     void showCountDownTimer();
+
+
     /**
      * 显示验证状态
      * @param b
