@@ -1,16 +1,15 @@
-package com.dalimao.mytaxi.main.presenter;
+package com.dalimao.mytaxi.main.model;
 
 import com.dalimao.mytaxi.common.lbs.LocationInfo;
 
 /**
- * Created by liuguangli on 17/5/14.
+ * Created by liuguangli on 17/5/31.
  */
 
-public interface IMainPresenter {
-    void loginByToken();
+public interface IMainManager {
 
     /**
-     * 获取附近司机
+     *  获取附近司机
      * @param latitude
      * @param longitude
      */
@@ -18,8 +17,9 @@ public interface IMainPresenter {
 
 
     /**
-     * 上报当前位置
+     * 上报位置
      * @param locationInfo
      */
+
     void updateLocationToServer(LocationInfo locationInfo);
 }

@@ -2,6 +2,8 @@ package com.dalimao.mytaxi.common.databus;
 
 import android.util.Log;
 
+import com.dalimao.mytaxi.common.lbs.LocationInfo;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -74,15 +76,25 @@ public class RxBus {
                 .subscribe(new Action1<Object>() {
                     @Override
                     public void call(Object data) {
-                        Log.d(TAG, "chainProcess start");
-                        for (Object subscriber : subscribers) {
-                            // 扫描注解，将数据发送到注册的对象的标记方法
-                            callMethodByAnnotiation(subscriber, data);
+                        if (data == null) {
+                            return;
                         }
-
+                        send(data);
                     }
                 });
     }
+
+    /**
+     * 发送数据
+     * @param data
+     */
+    public void send(Object data) {
+        for (Object subscriber : subscribers) {
+            // 扫描注解，将数据发送到注册的对象的标记方法
+            callMethodByAnnotiation(subscriber, data);
+        }
+    }
+
 
     /**
      * 反射获取对象方法列表，判断：
