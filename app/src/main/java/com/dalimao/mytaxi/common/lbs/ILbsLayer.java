@@ -65,6 +65,12 @@ public interface ILbsLayer {
     void onDestroy();
 
     void clearAllMarkers();
+    /**
+     *  移动动相机到某个点，
+     * @param locationInfo
+     * @param scale 缩放系数
+     */
+    void moveCameraToPoint(LocationInfo locationInfo, int scale);
 
 
     /**

@@ -13,4 +13,5 @@ public interface IView {
      *  显示错误
      */
     void showError(int Code, String msg);
+
 }

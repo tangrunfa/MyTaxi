@@ -1,8 +1,8 @@
 package com.dalimao.mytaxi.common.util;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
 import android.telephony.TelephonyManager;
 import android.view.inputmethod.InputMethodManager;
 
@@ -17,10 +17,17 @@ public class DevUtil {
      * @param context
      * @return
      */
+    @SuppressLint("MissingPermission")
     public static String UUID(Context context) {
-        TelephonyManager tm = (TelephonyManager)context
-                        .getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceId = tm.getDeviceId();
+        TelephonyManager tm = (TelephonyManager) context
+                .getSystemService(Context.TELEPHONY_SERVICE);
+        String deviceId = "";
+        try {
+
+            tm.getDeviceId();
+        } catch (Exception e) {
+            LogUtil.d("UUID", e.getMessage());
+        }
         return deviceId + System.currentTimeMillis();
     }
     public static void closeInputMethod(Activity context) {

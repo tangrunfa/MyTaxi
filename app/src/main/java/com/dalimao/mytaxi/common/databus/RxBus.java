@@ -1,9 +1,5 @@
 package com.dalimao.mytaxi.common.databus;
 
-import android.util.Log;
-
-import com.dalimao.mytaxi.common.lbs.LocationInfo;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;

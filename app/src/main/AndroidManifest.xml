@@ -27,7 +27,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="556e51b86c4e821c7a296272ea9f5b76" />
+            android:value="e2e8a16404b01877527b2bf68b1d8809" />
         <activity
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:name=".splash.SplashActivity">

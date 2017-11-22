@@ -22,4 +22,25 @@ public interface IMainPresenter {
      * @param locationInfo
      */
     void updateLocationToServer(LocationInfo locationInfo);
+
+    /**
+     * 呼叫司机
+     * @param cost
+     * @param key
+     * @param mStartLocation
+     * @param mEndLocation
+     */
+    void callDriver(String key, float cost, LocationInfo mStartLocation, LocationInfo mEndLocation);
+    /**
+     * 取消呼叫
+     */
+    void cancel();
+
+    boolean isLogin();
+    //支付
+    void pay();
+    /**
+     *  获取正在处理中的订单
+     */
+    void getProcessingOrder();
 }

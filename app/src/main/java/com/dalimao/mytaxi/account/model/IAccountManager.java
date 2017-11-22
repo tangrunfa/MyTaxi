@@ -1,7 +1,5 @@
 package com.dalimao.mytaxi.account.model;
 
-import android.os.Handler;
-
 /**
  * Created by liuguangli on 17/5/9.
  * 帐号相关业务逻辑抽象
@@ -60,4 +58,9 @@ public interface IAccountManager {
      * token 登录
      */
     void loginByToken();
+    /**
+     * 是否登录
+     * @return
+     */
+    boolean isLogin();
 }

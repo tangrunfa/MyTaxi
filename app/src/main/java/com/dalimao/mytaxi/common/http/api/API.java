@@ -24,6 +24,16 @@ public class API {
     public static final String GET_NEAR_DRIVERS = "/f34e28da5816433d/getNearDrivers?latitude=${latitude}&longitude=${longitude}";
     // 上报当前位置
     public static final String UPLOAD_LOCATION = "/f34e28da5816433d/updateUserLocation";
+    //  呼叫司机
+    public static final String CALL_DRIVER = "/f34e28da5816433d/callDriver";
+
+    // 取消订单
+    public static final String CANCEL_ORDER = "/f34e28da5816433d/cancelOrder";
+    // 支付成功
+    public static final String PAY = "/f34e28da5816433d/paySuc";
+    // 获取当前正在处理中的订单
+    public static final String GET_PROCESSING_ORDER = "/f34e28da5816433d/getProcessingOrder";
+
 
     // 检查用户是否存在
     public static String CHECK_USER_EXIST =
@@ -39,6 +49,7 @@ public class API {
         private static final String RELEASE_APP_ID = "e90928398db0130b0d6d21da7bde357e";
         private static final String TEST_APP_KEY = "514d8f8a2371bdf1566033f6664a24d2";
         private static final String RELEASE_APP_KEY = "514d8f8a2371bdf1566033f6664a24d2";
+
         private static String appId = TEST_APP_ID;
         private static String appKey = TEST_APP_KEY;
         private static String domain = TEST_DOMAIN;
